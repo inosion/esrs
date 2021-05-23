@@ -13,13 +13,24 @@
 [package]
 edition = "2018"
 name = "esrs"
-version = "0.2.9"
+version = "0.3.1"
 authors = ["Simone Cottini <cottini.simone@gmail.com>"]
 description = "A Prima.it-opinionated library to achieve cqrs/es"
-license = "MIT"
+readme = "README.md"
+keywords = ["architecture", "ddd", "event-sourcing", "cqrs", "es"]
+categories = ["rust-patterns", "web-programming", "asynchronous", "data-structures"]
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/primait/event_sourcing.rs"
+
+[[example]]
+name = "postgres-payments"
+path = "examples/postgres_payments/src/main.rs"
+
+[[example]]
+name = "sqlite-payments"
+path = "examples/sqlite_payments/src/main.rs"
 [dependencies.async-trait]
-version = "0.1.40"
+version = "0.1.50"
 
 [dependencies.chrono]
 version = "^0.4"
@@ -27,7 +38,6 @@ features = ["serde"]
 
 [dependencies.futures]
 version = "0.3.13"
-optional = true
 
 [dependencies.serde]
 version = "^1.0"
@@ -37,20 +47,16 @@ features = ["derive"]
 version = "^1.0"
 
 [dependencies.sqlx]
-version = "0.4.1"
-features = ["postgres", "runtime-tokio-native-tls", "uuid", "json", "chrono"]
-optional = true
-
-[dependencies.tokio]
-version = "1.5.0"
-features = ["full"]
-optional = true
+version = "0.4"
+features = ["runtime-tokio-native-tls", "uuid", "json", "chrono"]
 
 [dependencies.uuid]
 version = "^0.8.1"
 features = ["serde", "v4"]
+[dev-dependencies.tokio]
+version = "0.2"
+features = ["full"]
 
 [features]
-async = ["sqlx", "tokio", "futures"]
-blocking = []
-postgresql = []
+postgres = ["sqlx/postgres"]
+sqlite = ["sqlx/sqlite"]

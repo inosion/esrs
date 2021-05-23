@@ -1,15 +1,17 @@
+use std::fmt::Debug;
+
 use uuid::Uuid;
 
-use crate::SequenceNumber;
+use crate::esrs::SequenceNumber;
 
-#[derive(Clone)]
-pub struct AggregateState<S: Default + Clone> {
+#[derive(Debug, Clone)]
+pub struct AggregateState<S: Default + Debug + Clone> {
     pub(crate) id: Uuid,
     pub(crate) sequence_number: SequenceNumber,
     pub(crate) inner: S,
 }
 
-impl<S: Default + Clone> Default for AggregateState<S> {
+impl<S: Default + Debug + Clone> Default for AggregateState<S> {
     fn default() -> Self {
         Self {
             id: Uuid::new_v4(),
@@ -19,11 +21,19 @@ impl<S: Default + Clone> Default for AggregateState<S> {
     }
 }
 
-impl<S: Default + Clone> AggregateState<S> {
+impl<S: Default + Debug + Clone> AggregateState<S> {
     pub fn new(id: Uuid) -> Self {
         Self {
             id,
             inner: Default::default(),
+            sequence_number: 0,
+        }
+    }
+
+    pub fn new_with_state(id: Uuid, inner: S) -> Self {
+        Self {
+            id,
+            inner,
             sequence_number: 0,
         }
     }

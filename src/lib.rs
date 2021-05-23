@@ -1,11 +1,43 @@
-pub use util::*;
+#[cfg(any(feature = "postgres", feature = "sqlite"))]
+pub use sqlx;
 
-#[cfg(feature = "async")]
-pub mod async_impl;
+mod esrs;
 
-#[cfg(feature = "blocking")]
-pub mod blocking;
+pub mod aggregate {
+    pub use crate::esrs::aggregate::{Aggregate, AggregateName};
+    pub use crate::esrs::state::AggregateState;
+}
 
-mod query;
-pub mod state;
-mod util;
+pub mod error {
+    pub use serde_json::Error as JsonError;
+    #[cfg(any(feature = "postgres", feature = "sqlite"))]
+    pub use sqlx::Error as SqlxError;
+}
+
+#[cfg(any(feature = "postgres", feature = "sqlite"))]
+pub mod policy {
+    #[cfg(feature = "postgres")]
+    pub use crate::esrs::postgres::policy::PgPolicy;
+    #[cfg(feature = "sqlite")]
+    pub use crate::esrs::sqlite::policy::SqlitePolicy;
+}
+
+#[cfg(any(feature = "postgres", feature = "sqlite"))]
+pub mod projector {
+    #[cfg(feature = "postgres")]
+    pub use crate::esrs::postgres::projector::PgProjector;
+    #[cfg(feature = "sqlite")]
+    pub use crate::esrs::sqlite::projector::SqliteProjector;
+}
+
+pub mod store {
+    #[cfg(feature = "postgres")]
+    pub use crate::esrs::postgres::PgStore;
+    #[cfg(feature = "sqlite")]
+    pub use crate::esrs::sqlite::SqliteStore;
+    pub use crate::esrs::store::{EventStore, ProjectEvent, StoreEvent};
+}
+
+pub mod types {
+    pub use crate::esrs::SequenceNumber;
+}

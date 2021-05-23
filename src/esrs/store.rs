@@ -1,13 +1,13 @@
+use std::future::Future;
+use std::pin::Pin;
+
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::SequenceNumber;
-
-#[cfg(feature = "postgresql")]
-pub mod postgres;
+use crate::esrs::SequenceNumber;
 
 #[async_trait]
 pub trait EventStore<Event: Serialize + DeserializeOwned + Clone + Send + Sync, Error> {
@@ -20,9 +20,17 @@ pub trait EventStore<Event: Serialize + DeserializeOwned + Clone + Send + Sync, 
         sequence_number: SequenceNumber,
     ) -> Result<StoreEvent<Event>, Error>;
 
-    async fn rebuild_event(&self, store_event: &StoreEvent<Event>) -> Result<(), Error>;
-
     async fn close(&self);
+}
+
+pub trait ProjectEvent<Event: Serialize + DeserializeOwned + Clone + Send + Sync, Executor, Error> {
+    fn project_event<'a>(
+        &'a self,
+        store_event: &'a StoreEvent<Event>,
+        executor: &'a mut Executor,
+    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send + 'a>>
+    where
+        Self: Sync + 'a;
 }
 
 #[derive(Clone)]
